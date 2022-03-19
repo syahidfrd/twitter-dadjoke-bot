@@ -1,4 +1,4 @@
-module go-twitter-bot
+module twitter-dadjoke-bot
 
 go 1.14
 
