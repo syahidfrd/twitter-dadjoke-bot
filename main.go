@@ -133,7 +133,7 @@ func getRandomDadJoke() (dadJoke DadJoke, err error) {
 	}
 
 	if res.StatusCode >= 400 {
-		err = fmt.Errorf("dad joke api returning error status code %d", res.StatusCode)
+		err = fmt.Errorf("the request api dadjoke returned status code %d", res.StatusCode)
 		return
 	}
 
@@ -148,7 +148,7 @@ func crcHandler(rw http.ResponseWriter, r *http.Request) {
 	crcToken := r.URL.Query()["crc_token"]
 	if len(crcToken) < 1 {
 		rw.WriteHeader(http.StatusBadRequest)
-		rw.Write([]byte("crc_token not given"))
+		rw.Write([]byte("no crc token given"))
 		return
 	}
 
@@ -168,13 +168,13 @@ func crcHandler(rw http.ResponseWriter, r *http.Request) {
 func wehbookHandler(rw http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		http.Error(rw, "failed read body", http.StatusBadRequest)
+		http.Error(rw, "cannot read response body", http.StatusBadRequest)
 		return
 	}
 
 	var rawData map[string]interface{}
 	if err := json.Unmarshal(body, &rawData); err != nil {
-		http.Error(rw, "failed unmarshaling raw data json", http.StatusBadRequest)
+		http.Error(rw, "invalid parsing body response - rawData", http.StatusBadRequest)
 		return
 	}
 
@@ -185,7 +185,7 @@ func wehbookHandler(rw http.ResponseWriter, r *http.Request) {
 
 	var twitterMentionHook TwitterMentionHook
 	if err := json.Unmarshal(body, &twitterMentionHook); err != nil {
-		http.Error(rw, "failed unmarshaling twitter mention hook json", http.StatusBadRequest)
+		http.Error(rw, "invalid parsing body response - twitterMentionHook", http.StatusBadRequest)
 		return
 	}
 
@@ -195,20 +195,20 @@ func wehbookHandler(rw http.ResponseWriter, r *http.Request) {
 
 	dadJokeMatch, _ := regexp.MatchString("\\#dadjoke\\b", text)
 	if dadJokeMatch {
-		log.Println("receiving #dadjoke request")
+		log.Println("received #dadjoke request")
 		log.Println(string(body))
 
 		res, err := getRandomDadJoke()
 		if err != nil {
 			fmt.Println(err.Error())
-			http.Error(rw, "failed get dad joke", http.StatusBadRequest)
+			http.Error(rw, "failed get dadjoke", http.StatusBadRequest)
 			return
 		}
 
 		status := fmt.Sprintf("@%s %s", username, res.Joke)
-		if err := replayTweet(status, replayID); err != nil {
+		if err := replyTweet(status, replayID); err != nil {
 			fmt.Println(err.Error())
-			http.Error(rw, "failed to replay twit", http.StatusBadRequest)
+			http.Error(rw, "failed to replay tweet", http.StatusBadRequest)
 			return
 		}
 
@@ -226,7 +226,7 @@ func twitterClient() (client *http.Client) {
 	return
 }
 
-func replayTweet(tweet string, replyID string) (err error) {
+func replyTweet(tweet string, replyID string) (err error) {
 	path := fmt.Sprintf("%s/statuses/update.json", os.Getenv("TWITTER_BASE_URL"))
 
 	params := url.Values{}
@@ -252,7 +252,7 @@ func replayTweet(tweet string, replyID string) (err error) {
 	}
 
 	if resp.StatusCode >= 400 {
-		err = fmt.Errorf("api returning error status code: %d and response: %v", resp.StatusCode, data)
+		err = fmt.Errorf("the request api reply tweet returned status code: %d", resp.StatusCode)
 		return
 	}
 
