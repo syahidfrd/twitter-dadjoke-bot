@@ -220,7 +220,6 @@ func wehbookHandler(rw http.ResponseWriter, r *http.Request) {
 }
 
 func twitterClient() (client *http.Client) {
-	// 	// Setup twitter client
 	config := oauth1.NewConfig(os.Getenv("TWITTER_CONSUMER_KEY"), os.Getenv("TWITTER_CONSUMER_SECRET"))
 	token := oauth1.NewToken(os.Getenv("TWITTER_ACCESS_TOKEN"), os.Getenv("TWITTER_ACCESS_TOKEN_SECRET"))
 	client = config.Client(oauth1.NoContext, token)
