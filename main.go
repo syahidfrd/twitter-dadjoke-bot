@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"regexp"
 	"time"
 
 	"github.com/dghubble/oauth1"
@@ -85,7 +84,10 @@ type TwitterMentionHook struct {
 		RetweetCount  int         `json:"retweet_count"`
 		FavoriteCount int         `json:"favorite_count"`
 		Entities      struct {
-			Hashtags     []interface{} `json:"hashtags"`
+			Hashtags []struct {
+				Text    string `json:"text"`
+				Indices []int  `json:"indices"`
+			} `json:"hashtags"`
 			Urls         []interface{} `json:"urls"`
 			UserMentions []struct {
 				ScreenName string `json:"screen_name"`
@@ -194,12 +196,19 @@ func wehbookHandler(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	text := twitterMentionHook.TweetCreateEvents[0].Text
 	replayID := twitterMentionHook.TweetCreateEvents[0].IDStr
 	username := twitterMentionHook.TweetCreateEvents[0].User.ScreenName
+	hashtags := twitterMentionHook.TweetCreateEvents[0].Entities.Hashtags
 
-	dadJokeMatch, _ := regexp.MatchString("\\#dadjoke\\b", text)
-	if dadJokeMatch {
+	var isDadJokeMatch bool
+	for _, v := range hashtags {
+		if v.Text == "dadjoke" {
+			isDadJokeMatch = true
+			break
+		}
+	}
+
+	if isDadJokeMatch {
 		log.Println("received #dadjoke request")
 		log.Println(string(body))
 
