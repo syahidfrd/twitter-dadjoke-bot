@@ -105,13 +105,13 @@ type TwitterMentionHook struct {
 }
 
 type DadJoke struct {
-	ID     string `json:"id"`
-	Joke   string `json:"joke"`
-	Status int    `json:"status"`
+	Code int    `json:"code"`
+	Msg  string `json:"msg"`
+	Data string `json:"data"`
 }
 
 func getRandomDadJoke() (dadJoke DadJoke, err error) {
-	url := "https://icanhazdadjoke.com/"
+	url := "https://jokes-bapack2-api.herokuapp.com/v1/text/random"
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -205,7 +205,7 @@ func wehbookHandler(rw http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		status := fmt.Sprintf("@%s %s", username, res.Joke)
+		status := fmt.Sprintf("@%s %s", username, res.Data)
 		if err := replyTweet(status, replayID); err != nil {
 			fmt.Println(err.Error())
 			http.Error(rw, "failed to replay tweet", http.StatusBadRequest)
