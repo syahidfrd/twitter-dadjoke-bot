@@ -183,6 +183,11 @@ func wehbookHandler(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if _, exist := rawData["user_has_blocked"]; !exist {
+		rw.WriteHeader(http.StatusOK)
+		return
+	}
+
 	var twitterMentionHook TwitterMentionHook
 	if err := json.Unmarshal(body, &twitterMentionHook); err != nil {
 		http.Error(rw, "invalid parsing body response - twitterMentionHook", http.StatusBadRequest)
