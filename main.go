@@ -196,7 +196,7 @@ func wehbookHandler(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	replayID := twitterMentionHook.TweetCreateEvents[0].IDStr
+	replyID := twitterMentionHook.TweetCreateEvents[0].IDStr
 	username := twitterMentionHook.TweetCreateEvents[0].User.ScreenName
 	hashtags := twitterMentionHook.TweetCreateEvents[0].Entities.Hashtags
 
@@ -220,9 +220,9 @@ func wehbookHandler(rw http.ResponseWriter, r *http.Request) {
 		}
 
 		status := fmt.Sprintf("@%s %s", username, res.Data)
-		if err := replyTweet(status, replayID); err != nil {
+		if err := replyTweet(status, replyID); err != nil {
 			fmt.Println(err.Error())
-			http.Error(rw, "failed to replay tweet", http.StatusBadRequest)
+			http.Error(rw, "failed to reply tweet", http.StatusBadRequest)
 			return
 		}
 
