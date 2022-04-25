@@ -219,7 +219,7 @@ func wehbookHandler(rw http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		status := fmt.Sprintf("@%s %s\n-- Automated by BOT", username, res.Data)
+		status := fmt.Sprintf("@%s 🤖 Automated\n\n%s", username, res.Data)
 		if err := replyTweet(status, replyID); err != nil {
 			fmt.Println(err.Error())
 			http.Error(rw, "failed to reply tweet", http.StatusBadRequest)
